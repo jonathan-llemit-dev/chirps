@@ -41,7 +41,7 @@ class ChirpController extends Controller
             'message.max' => 'Chirps must be 255 characters or less.',
         ]);
         // Create the chirp (no user for now - we'll add auth later)
-        \App\Models\Chirp::create([
+        Chirp::create([
             'message' => $validated['message'],
             'user_id' => null, // We'll add authentication in lesson 11
         ]);
