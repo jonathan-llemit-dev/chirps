@@ -1,5 +1,5 @@
 @props(['chirp'])
-<div class="card bg-base-100 shadow">
+<div class="card bg-base-100">
     <div class="card-body">
         <div class="flex space-x-3">
             @if ($chirp->user)
