@@ -7,7 +7,7 @@
 
         <div class="card bg-base-100 mt-8">
             <div class="card-body">
-                <form method="POST" action="/chirps/{{ $chirp->id }}">
+                <form method="POST" action="{{ route('chirps.update', $chirp) }}">
                     @csrf
                     @method('PUT')
 

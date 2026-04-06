@@ -10,9 +10,9 @@ class ChirpPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,7 +20,7 @@ class ChirpPolicy
      */
     public function view(User $user, Chirp $chirp): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -36,7 +36,7 @@ class ChirpPolicy
      */
     public function update(User $user, Chirp $chirp): bool
     {
-        return $user->hasRole('admin') || $chirp->user()->is($user);
+        return $user->hasRole('admin') || $chirp->user_id === $user->id;
     }
 
     /**
@@ -44,7 +44,7 @@ class ChirpPolicy
      */
     public function delete(User $user, Chirp $chirp): bool
     {
-        return $user->hasRole('admin') || $chirp->user()->is($user);
+        return $user->hasRole('admin') || $chirp->user_id === $user->id;
     }
 
     /**

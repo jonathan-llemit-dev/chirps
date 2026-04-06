@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreChirpRequest;
+use App\Http\Requests\UpdateChirpRequest;
 use App\Models\Chirp;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 
 class ChirpController extends Controller
 {
@@ -15,43 +16,22 @@ class ChirpController extends Controller
      */
     public function index()
     {
-        $chirps = Chirp::with('user')
+        $chirps = Chirp::with('user:id,name')
             ->latest()
-            ->take(50)  // Limit to 50 most recent chirps
+            ->limit(50)
             ->get();
 
-        return view('home', ['chirps' => $chirps]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return view('home', compact('chirps'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreChirpRequest $request)
     {
-        $validated = $request->validate([
-            'message' => 'required|string|max:255',
-        ]);
+        auth()->user()->chirps()->create($request->validated());
 
-        // Use the authenticated user
-        auth()->user()->chirps()->create($validated);
-
-        return redirect('/')->with('success', 'Your chirp has been posted!');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return redirect()->route('home')->with('success', 'Your chirp has been posted!');
     }
 
     /**
@@ -67,17 +47,13 @@ class ChirpController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Chirp $chirp)
+    public function update(UpdateChirpRequest $request, Chirp $chirp)
     {
         $this->authorize('update', $chirp);
 
-        $validated = $request->validate([
-            'message' => 'required|string|max:255',
-        ]);
+        $chirp->update($request->validated());
 
-        $chirp->update($validated);
-
-        return redirect('/')->with('success', 'Chirp updated!');
+        return redirect()->route('home')->with('success', 'Chirp updated!');
     }
 
     /**
@@ -89,6 +65,6 @@ class ChirpController extends Controller
 
         $chirp->delete();
 
-        return redirect('/')->with('success', 'Chirp deleted!');
+        return redirect()->route('home')->with('success', 'Chirp deleted!');
     }
 }
