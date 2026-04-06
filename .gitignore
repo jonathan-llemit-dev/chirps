@@ -24,6 +24,6 @@ Homestead.yaml
 Thumbs.db
 .mcp.json
 AGENTS.md
-.github/skills/pest-testing/SKILL.md
-.github/skills/tailwindcss-development/SKILL.md
+.github/skills/
+.github/skills/
 boost.json
