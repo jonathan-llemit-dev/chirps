@@ -66,8 +66,8 @@ it('allows a guest to register and logout successfully', function () {
     $this->post('/register', [
         'name' => 'New User',
         'email' => 'new@example.com',
-        'password' => 'password',
-        'password_confirmation' => 'password',
+        'password' => 'qweqweQ1!',
+        'password_confirmation' => 'qweqweQ1!',
     ])->assertRedirect('/');
 
     $user = User::where('email', 'new@example.com')->first();
