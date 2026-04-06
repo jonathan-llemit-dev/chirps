@@ -8,16 +8,14 @@
                 <div class="card-body">
                     <h1 class="text-xl mt-1 font-bold text-center mb-6">Welcome Back</h1>
 
-                    <form method="POST" action="/login">
+                    <form method="POST" action="{{ route('login.attempt') }}">
                         @csrf
 
                         <!-- Email -->
                         <label class="floating-label mb-6">
                             <input type="email" name="email"
-                                placeholder="[mail@example.com](<mailto:mail@example.com>)" value="{{ old('email') }}"
-                                class="input input-bordered @error('email')
-input-error
-@enderror" required autofocus>
+                                placeholder="mail@example.com" value="{{ old('email') }}"
+                                class="input input-bordered @error('email') input-error @enderror" required autofocus>
                             <span>Email</span>
                         </label>
                         @error('email')
@@ -29,9 +27,7 @@ input-error
                         <!-- Password -->
                         <label class="floating-label mb-6">
                             <input type="password" name="password" placeholder="••••••••"
-                                class="input input-bordered @error('password')
-input-error
-@enderror" required>
+                                class="input input-bordered @error('password') input-error @enderror" required>
                             <span>Password</span>
                         </label>
                         @error('password')
@@ -59,7 +55,7 @@ input-error
                     <div class="divider">OR</div>
                     <p class="text-center text-sm">
                         Don't have an account?
-                        <a href="/register" class="link link-primary">Register</a>
+                        <a href="{{ route('register') }}" class="link link-primary">Register</a>
                     </p>
                 </div>
             </div>

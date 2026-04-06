@@ -8,7 +8,7 @@
                 <div class="card-body">
                     <h1 class="text-xl mt-1 font-bold text-center mb-6">Create Account</h1>
 
-                    <form method="POST" action="/register">
+                    <form method="POST" action="{{ route('register.store') }}">
                         @csrf
 
                         <!-- Name -->
@@ -26,10 +26,8 @@
                         <!-- Email -->
                         <label class="floating-label mb-6">
                             <input type="email" name="email"
-                                placeholder="[mail@example.com](<mailto:mail@example.com>)" value="{{ old('email') }}"
-                                class="input input-bordered @error('email')
-input-error
-@enderror" required>
+                                placeholder="mail@example.com" value="{{ old('email') }}"
+                                class="input input-bordered @error('email') input-error @enderror" required>
                             <span>Email</span>
                         </label>
                         @error('email')
@@ -68,7 +66,7 @@ input-error
                     <div class="divider">OR</div>
                     <p class="text-center text-sm">
                         Already have an account?
-                        <a href="/login" class="link link-primary">Sign in</a>
+                        <a href="{{ route('login') }}" class="link link-primary">Sign in</a>
                     </p>
                 </div>
             </div>
