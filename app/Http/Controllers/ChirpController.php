@@ -23,8 +23,25 @@ class ChirpController extends Controller
         $chirps = Chirp::query()
             ->with([
                 'user:id,name,email',
-                'comments' => function ($query): void {
-                    $query->with('user:id,name,email')->oldest();
+                'comments' => function ($query) use ($currentUser): void {
+                    $query
+                        ->with('user:id,name,email')
+                        ->withCount('likes')
+                        ->when(
+                            $currentUser !== null,
+                            fn ($commentQuery) => $commentQuery->withExists([
+                                'likes as liked_by_current_user' => fn (
+                                    Builder $likeQuery,
+                                ) => $likeQuery->where(
+                                    'user_id',
+                                    $currentUser->id,
+                                ),
+                            ]),
+                            fn ($commentQuery) => $commentQuery->selectRaw(
+                                'false as liked_by_current_user',
+                            ),
+                        )
+                        ->oldest();
                 },
             ])
             ->withCount(['likes', 'comments'])

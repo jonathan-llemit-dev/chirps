@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\Register;
 use App\Http\Controllers\ChirpController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CommentLikeController;
 use App\Http\Controllers\LikeController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,16 @@ Route::middleware('auth')->group(function () {
         LikeController::class,
         'destroy',
     ])->name('chirps.likes.destroy');
+
+    Route::post('/comments/{comment}/likes', [
+        CommentLikeController::class,
+        'store',
+    ])->name('comments.likes.store');
+
+    Route::delete('/comments/{comment}/likes', [
+        CommentLikeController::class,
+        'destroy',
+    ])->name('comments.likes.destroy');
 });
 
 Route::view('/register', 'auth.register')
