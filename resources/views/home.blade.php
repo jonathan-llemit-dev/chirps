@@ -5,32 +5,48 @@
     <div class="max-w-2xl mx-auto">
         <h1 class="text-3xl font-bold mt-8">Latest Chirps</h1>
 
-        <!-- Chirp Form -->
-        <div class="card bg-base-100 shadow mt-8">
-            <div class="card-body">
-                <form method="POST" action="/chirps">
-                    @csrf
-                    <div class="form-control w-full">
-                        <textarea name="message" placeholder="What's on your mind?"
-                            class="textarea textarea-bordered w-full resize-none @error('message') textarea-error @enderror" rows="4"
-                            maxlength="255" required>{{ old('message') }}</textarea>
-                        @error('message')
-                            <div class="label">
-                                <span class="label-text-alt text-error">{{ $message }}</span>
-                            </div>
-                        @enderror
-                    </div>
+        @auth
+            <div class="card bg-base-100 shadow mt-8">
+                <div class="card-body">
+                    <form method="POST" action="/chirps">
+                        @csrf
+                        <div class="form-control w-full">
+                            <textarea name="message" placeholder="What's on your mind?"
+                                class="textarea textarea-bordered w-full resize-none @error('message') textarea-error @enderror" rows="4"
+                                maxlength="255" required>{{ old('message') }}</textarea>
+                            @error('message')
+                                <div class="label">
+                                    <span class="label-text-alt text-error">{{ $message }}</span>
+                                </div>
+                            @enderror
+                        </div>
 
-                    <div class="mt-4 flex items-center justify-end">
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            Chirp
-                        </button>
-                    </div>
-                </form>
+                        <div class="mt-4 flex items-center justify-end">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Chirp
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        @else
+            <div class="card bg-base-100 shadow mt-8">
+                <div class="card-body items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="text-lg font-semibold">Join the conversation</h2>
+                        <p class="text-sm text-base-content/70 mt-1">
+                            Sign in to post your own chirps, like posts, and leave comments.
+                        </p>
+                    </div>
 
-        <!-- Feed -->
+                    <div class="flex gap-2">
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm">Sign In</a>
+                        <a href="{{ route('register') }}" class="btn btn-ghost btn-sm">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        @endauth
+
         <div class="space-y-4 mt-8">
             @forelse ($chirps as $chirp)
                 <x-chirp :chirp="$chirp" />
