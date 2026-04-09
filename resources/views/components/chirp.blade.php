@@ -67,80 +67,108 @@
                 <div class="rounded-box bg-base-200/70 px-4 py-3">
                     <p class="whitespace-pre-line text-base leading-7 text-base-content md:text-lg">{{ $chirp->message }}</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-3 text-sm text-base-content/70">
-                    <span>{{ $chirp->likes_count }} {{ \Illuminate\Support\Str::plural('like', $chirp->likes_count) }}</span>
-                    <details class="group">
-                        <summary class="cursor-pointer list-none hover:text-base-content">
-                            {{ $chirp->comments_count }} {{ \Illuminate\Support\Str::plural('comment', $chirp->comments_count) }}
-                        </summary>
+                <div class="space-y-3">
+                    <input type="checkbox" id="comments-toggle-{{ $chirp->id }}" class="peer hidden">
 
-                        <div class="ml-4 mt-3 border-l-2 border-base-300 pl-4 pt-3">
-                            <div class="space-y-3">
-                                <h3 class="text-sm font-semibold text-base-content/80">Comments</h3>
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-base-content/70">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span>{{ $chirp->likes_count }} {{ \Illuminate\Support\Str::plural('like', $chirp->likes_count) }}</span>
+                            @auth
+                                @if ($chirp->liked_by_current_user)
+                                    <form method="POST" action="{{ route('chirps.likes.destroy', $chirp) }}">
+                                        @csrf
+                                        @method('DELETE')
 
-                                @forelse ($chirp->comments as $comment)
-                                    <div class="rounded-box bg-base-200/80 px-4 py-3">
-                                        <div class="flex flex-wrap items-center gap-2 text-sm">
-                                            <span class="font-medium">{{ $comment->user->name }}</span>
-                                            <span class="text-base-content/50">·</span>
-                                            <span class="text-base-content/60">{{ $comment->created_at->diffForHumans() }}</span>
-                                        </div>
-
-                                        <p class="mt-2 whitespace-pre-line text-sm leading-6">{{ $comment->message }}</p>
-                                    </div>
-                                @empty
-                                    <p class="text-sm text-base-content/60">No comments yet. Start the conversation.</p>
-                                @endforelse
-
-                                @auth
-                                    <form method="POST" action="{{ route('chirps.comments.store', $chirp) }}" class="space-y-2">
+                                        <button type="submit" class="btn btn-outline btn-sm">
+                                            Unlike
+                                        </button>
+                                    </form>
+                                @else
+                                    <form method="POST" action="{{ route('chirps.likes.store', $chirp) }}">
                                         @csrf
 
-                                        <div class="form-control">
-                                            <textarea name="message" rows="3" maxlength="255" required
-                                                placeholder="Write a comment..."
-                                                class="textarea textarea-bordered w-full resize-none @error('message') textarea-error @enderror">{{ old('message') }}</textarea>
-
-                                            @error('message')
-                                                <div class="label">
-                                                    <span class="label-text-alt text-error">{{ $message }}</span>
-                                                </div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="flex justify-end">
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                Comment
-                                            </button>
-                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            Like
+                                        </button>
                                     </form>
-                                @endauth
-                            </div>
+                                @endif
+                            @endauth
                         </div>
-                    </details>
-                </div>
 
-                <div class="flex flex-wrap items-center gap-2">
-                    @auth
-                        @if ($chirp->liked_by_current_user)
-                            <form method="POST" action="{{ route('chirps.likes.destroy', $chirp) }}">
-                                @csrf
-                                @method('DELETE')
+                        <label for="comments-toggle-{{ $chirp->id }}"
+                            class="cursor-pointer hover:text-base-content">
+                            {{ $chirp->comments_count }} {{ \Illuminate\Support\Str::plural('comment', $chirp->comments_count) }}
+                        </label>
+                    </div>
 
-                                <button type="submit" class="btn btn-outline btn-sm">
-                                    Unlike
-                                </button>
-                            </form>
-                        @else
-                            <form method="POST" action="{{ route('chirps.likes.store', $chirp) }}">
-                                @csrf
+                    <div class="ml-4 hidden border-l-2 border-base-300 pl-4 pt-3 peer-checked:block">
+                        <div class="flex flex-col space-y-3">
+                            <h3 class="text-sm font-semibold text-base-content/80">Comments</h3>
 
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    Like
-                                </button>
-                            </form>
-                        @endif
-                    @endauth
+                            @forelse ($chirp->comments as $comment)
+                                <div class="w-full rounded-box bg-base-200/80 px-4 py-3">
+                                    <div class="flex flex-wrap items-center gap-2 text-sm">
+                                        <span class="font-medium">{{ $comment->user->name }}</span>
+                                        <span class="text-base-content/50">·</span>
+                                        <span class="text-base-content/60">{{ $comment->created_at->diffForHumans() }}</span>
+                                    </div>
+
+                                    <p class="mt-2 whitespace-pre-line text-sm leading-6">{{ $comment->message }}</p>
+
+                                    <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-base-content/70">
+                                        <span>{{ $comment->likes_count ?? 0 }} {{ \Illuminate\Support\Str::plural('like', $comment->likes_count ?? 0) }}</span>
+
+                                        @auth
+                                            @if ($comment->liked_by_current_user ?? false)
+                                                <form method="POST" action="{{ route('comments.likes.destroy', $comment) }}">
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit" class="btn btn-ghost btn-xs">
+                                                        Unlike
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <form method="POST" action="{{ route('comments.likes.store', $comment) }}">
+                                                    @csrf
+
+                                                    <button type="submit" class="btn btn-ghost btn-xs">
+                                                        Like
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @endauth
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-sm text-base-content/60">No comments yet. Start the conversation.</p>
+                            @endforelse
+
+                            @auth
+                                <form method="POST" action="{{ route('chirps.comments.store', $chirp) }}" class="w-full space-y-2">
+                                    @csrf
+
+                                    <div class="form-control">
+                                        <textarea name="message" rows="3" maxlength="255" required
+                                            placeholder="Write a comment..."
+                                            class="textarea textarea-bordered w-full resize-none @error('message') textarea-error @enderror">{{ old('message') }}</textarea>
+
+                                        @error('message')
+                                            <div class="label">
+                                                <span class="label-text-alt text-error">{{ $message }}</span>
+                                            </div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            Comment
+                                        </button>
+                                    </div>
+                                </form>
+                            @endauth
+                        </div>
+                    </div>
                 </div>
 
 
