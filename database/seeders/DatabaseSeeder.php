@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Admin User',
                 'password' => Hash::make('password'),
-            ]
+            ],
         );
         $admin->assignRole('admin');
 
@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Test User',
                 'password' => Hash::make('password'),
-            ]
+            ],
         );
         $user->assignRole('user');
 
@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Moderator User',
                 'password' => Hash::make('password'),
-            ]
+            ],
         );
         $moderator->assignRole('moderator');
 
@@ -60,5 +60,7 @@ class DatabaseSeeder extends Seeder
         if ($moderator->chirps()->count() === 0) {
             Chirp::factory()->for($moderator)->count(2)->create();
         }
+
+        $this->call([CommentSeeder::class, LikeSeeder::class]);
     }
 }
