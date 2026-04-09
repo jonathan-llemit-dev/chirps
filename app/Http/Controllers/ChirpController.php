@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreChirpRequest;
 use App\Http\Requests\UpdateChirpRequest;
 use App\Models\Chirp;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\View\View;
 
 class ChirpController extends Controller
 {
@@ -14,9 +16,29 @@ class ChirpController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
-        $chirps = Chirp::with('user:id,name')
+        $currentUser = auth()->user();
+
+        $chirps = Chirp::query()
+            ->with([
+                'user:id,name,email',
+                'comments' => function ($query): void {
+                    $query->with('user:id,name,email')->oldest();
+                },
+            ])
+            ->withCount(['likes', 'comments'])
+            ->when(
+                $currentUser !== null,
+                fn (Builder $query) => $query->withExists([
+                    'likes as liked_by_current_user' => fn (
+                        Builder $likeQuery,
+                    ) => $likeQuery->where('user_id', $currentUser->id),
+                ]),
+                fn (Builder $query) => $query->selectRaw(
+                    'false as liked_by_current_user',
+                ),
+            )
             ->latest()
             ->limit(50)
             ->get();
@@ -31,7 +53,9 @@ class ChirpController extends Controller
     {
         auth()->user()->chirps()->create($request->validated());
 
-        return redirect()->route('home')->with('success', 'Your chirp has been posted!');
+        return redirect()
+            ->route('home')
+            ->with('success', 'Your chirp has been posted!');
     }
 
     /**
