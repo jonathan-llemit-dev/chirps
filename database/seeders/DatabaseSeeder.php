@@ -61,6 +61,10 @@ class DatabaseSeeder extends Seeder
             Chirp::factory()->for($moderator)->count(2)->create();
         }
 
-        $this->call([CommentSeeder::class, LikeSeeder::class]);
+        $this->call([
+            CommentSeeder::class,
+            LikeSeeder::class,
+            CommentLikeSeeder::class,
+        ]);
     }
 }
